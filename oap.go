@@ -11,19 +11,26 @@ type INode interface {
 type IObject interface {
 	INode
 	Action(name Name) *Action
+	Finalize() *Object
 }
 
-type IAction interface {
-	IParam
-}
-
-type IParam interface {
+type IParametrized interface {
 	INode
 	Allow()
 	Deny()
 	IsAllowed() bool
 	Param(name Name) *Param
 	End() *Param
+}
+
+type IAction interface {
+	IParametrized
+	Finalize() *Action
+}
+
+type IParam interface {
+	IParametrized
+	Finalize() *Param
 }
 
 var (
@@ -33,8 +40,9 @@ var (
 )
 
 type Object struct {
-	name    Name
-	actions map[Name]*Action
+	name      Name
+	actions   map[Name]*Action
+	finalized bool
 }
 
 func NewObject(name Name) *Object {
@@ -53,6 +61,10 @@ func (o *Object) Action(name Name) *Action {
 
 	action, ok := o.actions[name]
 	if !ok {
+		if o.finalized {
+			panic("cannot append to finalized object")
+		}
+
 		action = &Action{
 			Param: Param{name: name},
 		}
@@ -78,16 +90,32 @@ func (o *Object) GetAllowedPaths() []Path {
 	return paths
 }
 
+func (o *Object) Finalize() *Object {
+	o.finalized = true
+
+	for _, action := range o.actions {
+		action.Finalize()
+	}
+
+	return o
+}
+
 type Action struct {
 	Param
 }
 
+func (a *Action) Finalize() *Action {
+	a.Param.Finalize()
+	return a
+}
+
 type Param struct {
-	parent  *Param
-	name    Name
-	params  map[Name]*Param
-	allowed bool
-	deadEnd bool
+	parent    *Param
+	name      Name
+	params    map[Name]*Param
+	allowed   bool
+	deadEnd   bool
+	finalized bool
 }
 
 func (p *Param) Name() Name      { return p.name }
@@ -102,6 +130,10 @@ func (p *Param) Param(name Name) *Param {
 
 	param, ok := p.params[name]
 	if !ok {
+		if p.finalized {
+			panic("cannot append to finalized node")
+		}
+
 		param = &Param{parent: p, name: name}
 		p.params[name] = param
 	}
@@ -110,7 +142,9 @@ func (p *Param) Param(name Name) *Param {
 }
 
 func (p *Param) End() *Param {
-	if len(p.params) > 0 {
+	if p.finalized {
+		panic("cannot modify finalized node")
+	} else if len(p.params) > 0 {
 		panic("cannot set node with children as dead-end")
 	}
 
@@ -135,7 +169,21 @@ func (p *Param) GetAllowedPaths() []Path {
 	return paths
 }
 
+func (p *Param) Finalize() *Param {
+	p.finalized = true
+
+	for _, param := range p.params {
+		param.Finalize()
+	}
+
+	return p
+}
+
 func (p *Param) setAllow(v bool, inPropagation ...bool) {
+	if p.finalized {
+		panic("cannot modify finalized node")
+	}
+
 	_inPropagation := len(inPropagation) > 0 && inPropagation[0]
 
 	if v {
