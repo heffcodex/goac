@@ -1,62 +1,62 @@
 package goac
 
-type Name string
-type Path string
+type OAPName string
+type OAPPath string
 
-type INode interface {
-	Name() Name
-	GetAllowedPaths() []Path
+type IOAPNode interface {
+	Name() OAPName
+	GetAllowedPaths() []OAPPath
 }
 
-type IObject interface {
-	INode
-	Action(name Name) *Action
-	Finalize() *Object
+type IOAPObject interface {
+	IOAPNode
+	Action(name OAPName) *OAPAction
+	Finalize() *OAPObject
 }
 
-type IParametrized interface {
-	INode
+type IOAPParametrized interface {
+	IOAPNode
 	Allow()
 	Deny()
 	IsAllowed() bool
-	Param(name Name) *Param
-	End() *Param
+	Param(name OAPName) *OAPParam
+	End() *OAPParam
 }
 
-type IAction interface {
-	IParametrized
-	Finalize() *Action
+type IOAPAction interface {
+	IOAPParametrized
+	Finalize() *OAPAction
 }
 
-type IParam interface {
-	IParametrized
-	Finalize() *Param
+type IOAPParam interface {
+	IOAPParametrized
+	Finalize() *OAPParam
 }
 
 var (
-	_ IObject = (*Object)(nil)
-	_ IAction = (*Action)(nil)
-	_ IParam  = (*Param)(nil)
+	_ IOAPObject = (*OAPObject)(nil)
+	_ IOAPAction = (*OAPAction)(nil)
+	_ IOAPParam  = (*OAPParam)(nil)
 )
 
-type Object struct {
-	name      Name
-	actions   map[Name]*Action
+type OAPObject struct {
+	name      OAPName
+	actions   map[OAPName]*OAPAction
 	finalized bool
 }
 
-func NewObject(name Name) *Object {
-	return &Object{
+func NewOAPObject(name OAPName) *OAPObject {
+	return &OAPObject{
 		name:    name,
-		actions: make(map[Name]*Action),
+		actions: make(map[OAPName]*OAPAction),
 	}
 }
 
-func (o *Object) Name() Name { return o.name }
+func (o *OAPObject) Name() OAPName { return o.name }
 
-func (o *Object) Action(name Name) *Action {
+func (o *OAPObject) Action(name OAPName) *OAPAction {
 	if o.actions == nil {
-		o.actions = make(map[Name]*Action)
+		o.actions = make(map[OAPName]*OAPAction)
 	}
 
 	action, ok := o.actions[name]
@@ -65,8 +65,8 @@ func (o *Object) Action(name Name) *Action {
 			panic("cannot append to finalized object")
 		}
 
-		action = &Action{
-			Param: Param{name: name},
+		action = &OAPAction{
+			OAPParam: OAPParam{name: name},
 		}
 		o.actions[name] = action
 	}
@@ -74,8 +74,8 @@ func (o *Object) Action(name Name) *Action {
 	return action
 }
 
-func (o *Object) GetAllowedPaths() []Path {
-	paths := make([]Path, 0, len(o.actions))
+func (o *OAPObject) GetAllowedPaths() []OAPPath {
+	paths := make([]OAPPath, 0, len(o.actions))
 
 	for _, action := range o.actions {
 		if !action.allowed {
@@ -83,14 +83,14 @@ func (o *Object) GetAllowedPaths() []Path {
 		}
 
 		for _, path := range action.GetAllowedPaths() {
-			paths = append(paths, Path(o.name)+"."+path)
+			paths = append(paths, OAPPath(o.name)+"."+path)
 		}
 	}
 
 	return paths
 }
 
-func (o *Object) Finalize() *Object {
+func (o *OAPObject) Finalize() *OAPObject {
 	o.finalized = true
 
 	for _, action := range o.actions {
@@ -100,30 +100,30 @@ func (o *Object) Finalize() *Object {
 	return o
 }
 
-type Action struct {
-	Param
+type OAPAction struct {
+	OAPParam
 }
 
-func (a *Action) Finalize() *Action {
-	a.Param.Finalize()
+func (a *OAPAction) Finalize() *OAPAction {
+	a.OAPParam.Finalize()
 	return a
 }
 
-type Param struct {
-	parent    *Param
-	name      Name
-	params    map[Name]*Param
+type OAPParam struct {
+	parent    *OAPParam
+	name      OAPName
+	params    map[OAPName]*OAPParam
 	allowed   bool
 	deadEnd   bool
 	finalized bool
 }
 
-func (p *Param) Name() Name      { return p.name }
-func (p *Param) Allow()          { p.setAllow(true) }
-func (p *Param) Deny()           { p.setAllow(false) }
-func (p *Param) IsAllowed() bool { return p.allowed }
+func (p *OAPParam) Name() OAPName   { return p.name }
+func (p *OAPParam) Allow()          { p.setAllow(true) }
+func (p *OAPParam) Deny()           { p.setAllow(false) }
+func (p *OAPParam) IsAllowed() bool { return p.allowed }
 
-func (p *Param) Param(name Name) *Param {
+func (p *OAPParam) Param(name OAPName) *OAPParam {
 	if p.deadEnd {
 		panic("cannot append to dead-end node")
 	}
@@ -134,14 +134,14 @@ func (p *Param) Param(name Name) *Param {
 			panic("cannot append to finalized node")
 		}
 
-		param = &Param{parent: p, name: name}
+		param = &OAPParam{parent: p, name: name}
 		p.params[name] = param
 	}
 
 	return param
 }
 
-func (p *Param) End() *Param {
+func (p *OAPParam) End() *OAPParam {
 	if p.finalized {
 		panic("cannot modify finalized node")
 	} else if len(p.params) > 0 {
@@ -153,8 +153,8 @@ func (p *Param) End() *Param {
 	return p
 }
 
-func (p *Param) GetAllowedPaths() []Path {
-	paths := make([]Path, 0, len(p.params))
+func (p *OAPParam) GetAllowedPaths() []OAPPath {
+	paths := make([]OAPPath, 0, len(p.params))
 
 	for _, param := range p.params {
 		if !param.allowed {
@@ -162,14 +162,14 @@ func (p *Param) GetAllowedPaths() []Path {
 		}
 
 		for _, path := range param.GetAllowedPaths() {
-			paths = append(paths, Path(p.name)+"."+path)
+			paths = append(paths, OAPPath(p.name)+"."+path)
 		}
 	}
 
 	return paths
 }
 
-func (p *Param) Finalize() *Param {
+func (p *OAPParam) Finalize() *OAPParam {
 	p.finalized = true
 
 	for _, param := range p.params {
@@ -179,7 +179,7 @@ func (p *Param) Finalize() *Param {
 	return p
 }
 
-func (p *Param) setAllow(v bool, inPropagation ...bool) {
+func (p *OAPParam) setAllow(v bool, inPropagation ...bool) {
 	if p.finalized {
 		panic("cannot modify finalized node")
 	}

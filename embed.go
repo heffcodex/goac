@@ -4,23 +4,23 @@ import "encoding/json"
 
 type IEmbed interface {
 	json.Marshaler
-	GetOAP() IObject
-	SetOAP(o IObject)
+	GetOAP() IOAPObject
+	SetOAP(o IOAPObject)
 	UpdateOAPPermissions()
 }
 
 var _ IEmbed = (*Embed)(nil)
 
 type Embed struct {
-	Permissions []Path `json:"__permissions,omitempty"`
-	o           IObject
+	Permissions []OAPPath `json:"__permissions,omitempty"`
+	o           IOAPObject
 }
 
-func (e *Embed) GetOAP() IObject {
+func (e *Embed) GetOAP() IOAPObject {
 	return e.o
 }
 
-func (e *Embed) SetOAP(o IObject) {
+func (e *Embed) SetOAP(o IOAPObject) {
 	e.o = o
 }
 
