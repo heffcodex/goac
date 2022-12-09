@@ -1,10 +1,12 @@
 package goac
 
+import "github.com/heffcodex/goac/oap"
+
 type Embed struct {
-	Permissions []OAPPath `json:"__permissions,omitempty"`
+	Permissions []oap.Path `json:"__permissions,omitempty"`
 }
 
-func NewEmbed(permissions []OAPPath) Embed {
+func NewEmbed(permissions []oap.Path) Embed {
 	return Embed{
 		Permissions: permissions,
 	}
