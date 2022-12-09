@@ -3,9 +3,13 @@ package goac
 type OAPName string
 type OAPPath string
 
-type IOAPNode interface {
-	Name() OAPName
+type IOAPPathGetter interface {
 	GetAllowedPaths() []OAPPath
+}
+
+type IOAPNode interface {
+	IOAPPathGetter
+	Name() OAPName
 }
 
 type IOAPObject interface {
