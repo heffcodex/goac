@@ -2,6 +2,7 @@ package oap
 
 type IAction interface {
 	IParametrized
+	SetAllow(v bool) *Action
 	Allow() *Action
 	Deny() *Action
 	End() *Action
@@ -14,8 +15,9 @@ type Action struct {
 	Param
 }
 
-func (a *Action) Allow() *Action { a.Param.Allow(); return a }
-func (a *Action) Deny() *Action  { a.Param.Deny(); return a }
+func (a *Action) SetAllow(v bool) *Action { a.Param.SetAllow(v); return a }
+func (a *Action) Allow() *Action          { a.Param.Allow(); return a }
+func (a *Action) Deny() *Action           { a.Param.Deny(); return a }
 
 func (a *Action) End() *Action {
 	a.Param.End()

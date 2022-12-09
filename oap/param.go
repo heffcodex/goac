@@ -2,6 +2,7 @@ package oap
 
 type IParam interface {
 	IParametrized
+	SetAllow(v bool) *Param
 	Allow() *Param
 	Deny() *Param
 	End() *Param
@@ -19,10 +20,11 @@ type Param struct {
 	finalized bool
 }
 
-func (p *Param) Name() string  { return p.name }
-func (p *Param) Allow() *Param { p.setAllow(true); return p }
-func (p *Param) Deny() *Param  { p.setAllow(false); return p }
-func (p *Param) Allowed() bool { return p.allowed }
+func (p *Param) Name() string           { return p.name }
+func (p *Param) SetAllow(v bool) *Param { p.setAllow(v); return p }
+func (p *Param) Allow() *Param          { p.setAllow(true); return p }
+func (p *Param) Deny() *Param           { p.setAllow(false); return p }
+func (p *Param) Allowed() bool          { return p.allowed }
 
 func (p *Param) Param(name string) *Param {
 	if p.deadEnd {
