@@ -11,8 +11,6 @@ type INode interface {
 
 type IParametrized interface {
 	INode
-	Allow()
-	Deny()
 	Allowed() bool
 	Param(name string) *Param
 }
