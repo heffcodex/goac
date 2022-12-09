@@ -20,16 +20,17 @@ type IOAPParametrized interface {
 	Deny()
 	Allowed() bool
 	Param(name OAPName) *OAPParam
-	End() *OAPParam
 }
 
 type IOAPAction interface {
 	IOAPParametrized
+	End() *OAPAction
 	Finalize() *OAPAction
 }
 
 type IOAPParam interface {
 	IOAPParametrized
+	End() *OAPParam
 	Finalize() *OAPParam
 }
 
@@ -102,6 +103,11 @@ func (o *OAPObject) Finalize() *OAPObject {
 
 type OAPAction struct {
 	OAPParam
+}
+
+func (a *OAPAction) End() *OAPAction {
+	a.OAPParam.End()
+	return a
 }
 
 func (a *OAPAction) Finalize() *OAPAction {
