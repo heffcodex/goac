@@ -4,8 +4,8 @@ type Embed struct {
 	Permissions []OAPPath `json:"__permissions,omitempty"`
 }
 
-func NewEmbed(permissions []OAPPath) Embed {
+func NewEmbed(oap IOAPObject) Embed {
 	return Embed{
-		Permissions: permissions,
+		Permissions: oap.GetAllowedPaths(),
 	}
 }
