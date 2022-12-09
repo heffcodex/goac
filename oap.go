@@ -18,7 +18,7 @@ type IOAPParametrized interface {
 	IOAPNode
 	Allow()
 	Deny()
-	IsAllowed() bool
+	Allowed() bool
 	Param(name OAPName) *OAPParam
 	End() *OAPParam
 }
@@ -118,10 +118,10 @@ type OAPParam struct {
 	finalized bool
 }
 
-func (p *OAPParam) Name() OAPName   { return p.name }
-func (p *OAPParam) Allow()          { p.setAllow(true) }
-func (p *OAPParam) Deny()           { p.setAllow(false) }
-func (p *OAPParam) IsAllowed() bool { return p.allowed }
+func (p *OAPParam) Name() OAPName { return p.name }
+func (p *OAPParam) Allow()        { p.setAllow(true) }
+func (p *OAPParam) Deny()         { p.setAllow(false) }
+func (p *OAPParam) Allowed() bool { return p.allowed }
 
 func (p *OAPParam) Param(name OAPName) *OAPParam {
 	if p.deadEnd {
