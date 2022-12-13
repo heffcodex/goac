@@ -11,6 +11,8 @@ type IScopedObject interface {
 	SetErr(err error)
 }
 
+var _ IScopedObject = (*Scoped)(nil)
+
 type Scoped struct {
 	base        IObject
 	ctxProvider CtxProvider
