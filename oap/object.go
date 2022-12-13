@@ -2,8 +2,9 @@ package goacoap
 
 type IObject interface {
 	INode
-	Action(name string) *Action
-	Finalize() *Object
+	Action(name string) IAction
+	Fresh() IObject
+	Finalize() IObject
 }
 
 var _ IObject = (*Object)(nil)
@@ -23,7 +24,7 @@ func NewObject(name string) *Object {
 
 func (o *Object) Name() string { return o.name }
 
-func (o *Object) Action(name string) *Action {
+func (o *Object) Action(name string) IAction {
 	if o.actions == nil {
 		o.actions = make(map[string]*Action)
 	}
@@ -59,7 +60,11 @@ func (o *Object) GetAllowedPaths() []Path {
 	return paths
 }
 
-func (o *Object) Finalize() *Object {
+func (o *Object) Fresh() IObject {
+	return NewObject(o.name)
+}
+
+func (o *Object) Finalize() IObject {
 	o.finalized = true
 
 	for _, action := range o.actions {

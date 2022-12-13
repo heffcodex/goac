@@ -2,11 +2,11 @@ package goacoap
 
 type IParam interface {
 	IParametrized
-	SetAllow(v bool) *Param
-	Allow() *Param
-	Deny() *Param
-	End() *Param
-	Finalize() *Param
+	SetAllow(v bool) IParam
+	Allow() IParam
+	Deny() IParam
+	End() IParam
+	Finalize() IParam
 }
 
 var _ IParam = (*Param)(nil)
@@ -21,12 +21,12 @@ type Param struct {
 }
 
 func (p *Param) Name() string           { return p.name }
-func (p *Param) SetAllow(v bool) *Param { p.setAllow(v); return p }
-func (p *Param) Allow() *Param          { p.setAllow(true); return p }
-func (p *Param) Deny() *Param           { p.setAllow(false); return p }
+func (p *Param) SetAllow(v bool) IParam { p.setAllow(v); return p }
+func (p *Param) Allow() IParam          { p.setAllow(true); return p }
+func (p *Param) Deny() IParam           { p.setAllow(false); return p }
 func (p *Param) Allowed() bool          { return p.allowed }
 
-func (p *Param) Param(name string) *Param {
+func (p *Param) Param(name string) IParam {
 	if p.deadEnd {
 		panic("cannot append to dead-end node")
 	}
@@ -44,7 +44,7 @@ func (p *Param) Param(name string) *Param {
 	return param
 }
 
-func (p *Param) End() *Param {
+func (p *Param) End() IParam {
 	if p.finalized {
 		panic("cannot modify finalized node")
 	} else if len(p.params) > 0 {
@@ -76,7 +76,7 @@ func (p *Param) GetAllowedPaths() []Path {
 	return paths
 }
 
-func (p *Param) Finalize() *Param {
+func (p *Param) Finalize() IParam {
 	p.finalized = true
 
 	for _, param := range p.params {
