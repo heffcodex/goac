@@ -4,6 +4,13 @@ import "context"
 
 type CtxProvider func() context.Context
 
+type IScopedObject interface {
+	Base() IObject
+	Ctx() context.Context
+	Err() error
+	SetErr(err error)
+}
+
 type Scoped struct {
 	base        IObject
 	ctxProvider CtxProvider
