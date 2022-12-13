@@ -1,4 +1,4 @@
-package oap
+package goacoap
 
 type IPathGetter interface {
 	GetAllowedPaths() []Path

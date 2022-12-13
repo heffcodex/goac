@@ -1,4 +1,4 @@
-package oap
+package goacoap
 
 type IAction interface {
 	IParametrized

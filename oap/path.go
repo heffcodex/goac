@@ -1,4 +1,4 @@
-package oap
+package goacoap
 
 const PathDelimiter = "."
 

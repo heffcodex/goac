@@ -1,4 +1,4 @@
-package oap
+package goacoap
 
 type IParam interface {
 	IParametrized
