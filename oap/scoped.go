@@ -4,34 +4,34 @@ import "context"
 
 type CtxProvider func() context.Context
 
-type IScopedObject interface {
-	Base() IObject
+type IScoped[T any] interface {
+	Scope() T
 	Ctx() context.Context
 	Err() error
 	SetErr(err error)
 }
 
-var _ IScopedObject = (*Scoped)(nil)
+var _ IScoped[any] = (*Scoped[any])(nil)
 
-type Scoped struct {
-	base        IObject
+type Scoped[T any] struct {
+	scope       T
 	ctxProvider CtxProvider
 	err         error
 }
 
-func NewScopedObject(base IObject, ctxProvider CtxProvider) *Scoped {
+func NewScoped[T any](scope T, ctxProvider CtxProvider) *Scoped[T] {
 	if ctxProvider == nil {
 		ctxProvider = func() context.Context { return context.Background() }
 	}
 
-	return &Scoped{
-		base:        base,
+	return &Scoped[T]{
+		scope:       scope,
 		ctxProvider: ctxProvider,
 	}
 }
 
-func (s *Scoped) Base() IObject        { return s.base }
-func (s *Scoped) Ctx() context.Context { return s.ctxProvider() }
+func (s *Scoped[T]) Scope() T             { return s.scope }
+func (s *Scoped[T]) Ctx() context.Context { return s.ctxProvider() }
 
-func (s *Scoped) Err() error       { return s.err }
-func (s *Scoped) SetErr(err error) { s.err = err }
+func (s *Scoped[T]) Err() error       { return s.err }
+func (s *Scoped[T]) SetErr(err error) { s.err = err }
