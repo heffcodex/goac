@@ -9,7 +9,7 @@ type IScoped[O IObject, S any] interface {
 	Scope() S
 	Ctx() context.Context
 	Err() error
-	SetErr(err error) error
+	SetErr(err error) bool
 }
 
 var _ IScoped[IObject, any] = (*Scoped[IObject, any])(nil)
@@ -37,5 +37,5 @@ func (s *Scoped[O, S]) Base() O              { return s.base }
 func (s *Scoped[O, S]) Scope() S             { return s.scope }
 func (s *Scoped[O, S]) Ctx() context.Context { return s.ctxProvider() }
 
-func (s *Scoped[O, S]) Err() error             { return s.err }
-func (s *Scoped[O, S]) SetErr(err error) error { s.err = err; return s.err }
+func (s *Scoped[O, S]) Err() error            { return s.err }
+func (s *Scoped[O, S]) SetErr(err error) bool { s.err = err; return s.err != nil }
