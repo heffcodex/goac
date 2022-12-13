@@ -3,10 +3,10 @@ package goac
 import "github.com/heffcodex/goac/oap"
 
 type Embed struct {
-	Permissions []oap.Path `json:"__permissions,omitempty"`
+	Permissions []goacoap.Path `json:"__permissions,omitempty"`
 }
 
-func NewEmbed(o oap.IObject) Embed {
+func NewEmbed(o goacoap.IObject) Embed {
 	return Embed{
 		Permissions: o.GetAllowedPaths(),
 	}
