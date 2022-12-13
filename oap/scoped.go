@@ -4,34 +4,38 @@ import "context"
 
 type CtxProvider func() context.Context
 
-type IScoped[T any] interface {
-	Scope() T
+type IScoped[O IObject, S any] interface {
+	Base() O
+	Scope() S
 	Ctx() context.Context
 	Err() error
 	SetErr(err error)
 }
 
-var _ IScoped[any] = (*Scoped[any])(nil)
+var _ IScoped[IObject, any] = (*Scoped[IObject, any])(nil)
 
-type Scoped[T any] struct {
-	scope       T
+type Scoped[O IObject, S any] struct {
+	base        O
+	scope       S
 	ctxProvider CtxProvider
 	err         error
 }
 
-func NewScoped[T any](scope T, ctxProvider CtxProvider) *Scoped[T] {
+func NewScoped[O IObject, S any](base O, scope S, ctxProvider CtxProvider) *Scoped[O, S] {
 	if ctxProvider == nil {
 		ctxProvider = func() context.Context { return context.Background() }
 	}
 
-	return &Scoped[T]{
+	return &Scoped[O, S]{
+		base:        base,
 		scope:       scope,
 		ctxProvider: ctxProvider,
 	}
 }
 
-func (s *Scoped[T]) Scope() T             { return s.scope }
-func (s *Scoped[T]) Ctx() context.Context { return s.ctxProvider() }
+func (s *Scoped[O, S]) Base() O              { return s.base }
+func (s *Scoped[O, S]) Scope() S             { return s.scope }
+func (s *Scoped[O, S]) Ctx() context.Context { return s.ctxProvider() }
 
-func (s *Scoped[T]) Err() error       { return s.err }
-func (s *Scoped[T]) SetErr(err error) { s.err = err }
+func (s *Scoped[O, S]) Err() error       { return s.err }
+func (s *Scoped[O, S]) SetErr(err error) { s.err = err }
