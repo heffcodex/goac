@@ -36,7 +36,7 @@ func (o *Object) Action(name string) IAction {
 		}
 
 		action = &Action{
-			Param: Param{name: name},
+			Parameter: Parameter{name: name},
 		}
 		o.actions[name] = action
 	}

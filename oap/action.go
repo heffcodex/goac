@@ -12,19 +12,19 @@ type IAction interface {
 var _ IAction = (*Action)(nil)
 
 type Action struct {
-	Param
+	Parameter
 }
 
-func (a *Action) SetAllow(v bool) IAction { a.Param.SetAllow(v); return a }
-func (a *Action) Allow() IAction          { a.Param.Allow(); return a }
-func (a *Action) Deny() IAction           { a.Param.Deny(); return a }
+func (a *Action) SetAllow(v bool) IAction { a.Parameter.SetAllow(v); return a }
+func (a *Action) Allow() IAction          { a.Parameter.Allow(); return a }
+func (a *Action) Deny() IAction           { a.Parameter.Deny(); return a }
 
 func (a *Action) End() IAction {
-	a.Param.End()
+	a.Parameter.End()
 	return a
 }
 
 func (a *Action) Finalize() IAction {
-	a.Param.Finalize()
+	a.Parameter.Finalize()
 	return a
 }

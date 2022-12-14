@@ -1,32 +1,32 @@
 package goacoap
 
-type IParam interface {
+type IParameter interface {
 	IParametrized
-	SetAllow(v bool) IParam
-	Allow() IParam
-	Deny() IParam
-	End() IParam
-	Finalize() IParam
+	SetAllow(v bool) IParameter
+	Allow() IParameter
+	Deny() IParameter
+	End() IParameter
+	Finalize() IParameter
 }
 
-var _ IParam = (*Param)(nil)
+var _ IParameter = (*Parameter)(nil)
 
-type Param struct {
-	parent    *Param
+type Parameter struct {
+	parent    *Parameter
 	name      string
-	params    map[string]*Param
+	params    map[string]*Parameter
 	allowed   bool
 	deadEnd   bool
 	finalized bool
 }
 
-func (p *Param) Name() string           { return p.name }
-func (p *Param) SetAllow(v bool) IParam { p.setAllow(v); return p }
-func (p *Param) Allow() IParam          { p.setAllow(true); return p }
-func (p *Param) Deny() IParam           { p.setAllow(false); return p }
-func (p *Param) Allowed() bool          { return p.allowed }
+func (p *Parameter) Name() string               { return p.name }
+func (p *Parameter) SetAllow(v bool) IParameter { p.setAllow(v); return p }
+func (p *Parameter) Allow() IParameter          { p.setAllow(true); return p }
+func (p *Parameter) Deny() IParameter           { p.setAllow(false); return p }
+func (p *Parameter) Allowed() bool              { return p.allowed }
 
-func (p *Param) Param(name string) IParam {
+func (p *Parameter) Param(name string) IParameter {
 	if p.deadEnd {
 		panic("cannot append to dead-end node")
 	}
@@ -37,14 +37,14 @@ func (p *Param) Param(name string) IParam {
 			panic("cannot append to finalized node")
 		}
 
-		param = &Param{parent: p, name: name}
+		param = &Parameter{parent: p, name: name}
 		p.params[name] = param
 	}
 
 	return param
 }
 
-func (p *Param) End() IParam {
+func (p *Parameter) End() IParameter {
 	if p.finalized {
 		panic("cannot modify finalized node")
 	} else if len(p.params) > 0 {
@@ -56,7 +56,7 @@ func (p *Param) End() IParam {
 	return p
 }
 
-func (p *Param) GetAllowedPaths() []Path {
+func (p *Parameter) GetAllowedPaths() []Path {
 	if len(p.params) == 0 {
 		return []Path{NewPath(p.name)}
 	}
@@ -76,7 +76,7 @@ func (p *Param) GetAllowedPaths() []Path {
 	return paths
 }
 
-func (p *Param) Finalize() IParam {
+func (p *Parameter) Finalize() IParameter {
 	p.finalized = true
 
 	for _, param := range p.params {
@@ -86,7 +86,7 @@ func (p *Param) Finalize() IParam {
 	return p
 }
 
-func (p *Param) setAllow(v bool, inPropagation ...bool) {
+func (p *Parameter) setAllow(v bool, inPropagation ...bool) {
 	if p.finalized {
 		panic("cannot modify finalized node")
 	}
