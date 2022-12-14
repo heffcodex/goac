@@ -26,6 +26,10 @@ func (e *Embed) SetPermissions(p []goacoap.Path) {
 
 type ObjectEnforcer[T IEmbed] func(ctx context.Context, o T) (T, error)
 
-func (e ObjectEnforcer[T]) FromContext(ctx context.Context, key string) ObjectEnforcer[T] {
+func EnforcerFromContext[T IEmbed](ctx context.Context, key string) ObjectEnforcer[T] {
 	return ctx.Value(key).(ObjectEnforcer[T])
+}
+
+func EnforcerToContext[T IEmbed](ctx context.Context, key string, enforcer ObjectEnforcer[T]) context.Context {
+	return context.WithValue(ctx, key, enforcer)
 }
