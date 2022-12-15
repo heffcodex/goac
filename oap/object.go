@@ -44,20 +44,20 @@ func (o *Object) Action(name string) IAction {
 	return action
 }
 
-func (o *Object) GetAllowedPaths() []Path {
-	paths := make([]Path, 0, len(o.actions))
+func (o *Object) Permissions() []Permission {
+	perms := make([]Permission, 0, len(o.actions))
 
 	for _, action := range o.actions {
 		if !action.allowed {
 			continue
 		}
 
-		for _, path := range action.GetAllowedPaths() {
-			paths = append(paths, NewPath(o.name).Append(path.String()))
+		for _, perm := range action.Permissions() {
+			perms = append(perms, NewPermission(o.name).AppendPath(perm.String()))
 		}
 	}
 
-	return paths
+	return perms
 }
 
 func (o *Object) Fresh() IObject {

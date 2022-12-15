@@ -1,11 +1,11 @@
 package goacoap
 
-type IPathGetter interface {
-	GetAllowedPaths() []Path
+type IPermGetter interface {
+	Permissions() []Permission
 }
 
 type INode interface {
-	IPathGetter
+	IPermGetter
 	Name() string
 }
 

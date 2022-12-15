@@ -5,20 +5,23 @@ import (
 )
 
 type IEmbed interface {
-	GetPermissions() []goacoap.Path
-	SetPermissions([]goacoap.Path)
+	GetPermissions() []goacoap.Permission
+	SetPermissions(perms []goacoap.Permission)
 }
 
 var _ IEmbed = (*Embed)(nil)
 
 type Embed struct {
-	Permissions []goacoap.Path `json:"__permissions,omitempty"`
+	Permissions []goacoap.Permission `json:"__permissions,omitempty"`
 }
 
-func (e *Embed) GetPermissions() []goacoap.Path {
-	return e.Permissions
+func (e *Embed) GetPermissions() []goacoap.Permission {
+	perms := make([]goacoap.Permission, len(e.Permissions))
+	copy(perms, e.Permissions)
+	return perms
 }
 
-func (e *Embed) SetPermissions(p []goacoap.Path) {
-	e.Permissions = p
+func (e *Embed) SetPermissions(perms []goacoap.Permission) {
+	e.Permissions = make([]goacoap.Permission, len(perms))
+	copy(e.Permissions, perms)
 }

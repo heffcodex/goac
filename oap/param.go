@@ -56,24 +56,24 @@ func (p *Parameter) End() IParameter {
 	return p
 }
 
-func (p *Parameter) GetAllowedPaths() []Path {
+func (p *Parameter) Permissions() []Permission {
 	if len(p.params) == 0 {
-		return []Path{NewPath(p.name)}
+		return []Permission{NewPermission(p.name)}
 	}
 
-	paths := make([]Path, 0, len(p.params))
+	perms := make([]Permission, 0, len(p.params))
 
 	for _, param := range p.params {
 		if !param.allowed {
 			continue
 		}
 
-		for _, path := range param.GetAllowedPaths() {
-			paths = append(paths, NewPath(p.name).Append(path.String()))
+		for _, perm := range param.Permissions() {
+			perms = append(perms, NewPermission(p.name).AppendPath(perm.String()))
 		}
 	}
 
-	return paths
+	return perms
 }
 
 func (p *Parameter) Finalize() IParameter {
