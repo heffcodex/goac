@@ -15,6 +15,16 @@ type Embed struct {
 	Permissions []goacoap.Permission `json:"__permissions,omitempty"`
 }
 
+func NewEmbed(perms []goacoap.Permission) *Embed {
+	e := &Embed{}
+
+	if len(perms) > 0 {
+		e.SetPermissions(perms)
+	}
+
+	return e
+}
+
 func (e *Embed) GetPermissions() []goacoap.Permission {
 	perms := make([]goacoap.Permission, len(e.Permissions))
 	copy(perms, e.Permissions)
