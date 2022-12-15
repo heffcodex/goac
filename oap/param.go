@@ -33,10 +33,6 @@ func (p *Parameter) Param(name string) IParameter {
 
 	param, ok := p.params[name]
 	if !ok {
-		if p.finalized {
-			panic("cannot append to finalized node")
-		}
-
 		param = &Parameter{parent: p, name: name}
 		p.params[name] = param
 	}
@@ -45,9 +41,7 @@ func (p *Parameter) Param(name string) IParameter {
 }
 
 func (p *Parameter) End() IParameter {
-	if p.finalized {
-		panic("cannot modify finalized node")
-	} else if len(p.params) > 0 {
+	if len(p.params) > 0 {
 		panic("cannot set node with children as dead-end")
 	}
 
@@ -88,7 +82,7 @@ func (p *Parameter) Finalize() IParameter {
 
 func (p *Parameter) setAllow(v bool, inPropagation ...bool) {
 	if p.finalized {
-		panic("cannot modify finalized node")
+		panic("cannot change finalized permission")
 	}
 
 	_inPropagation := len(inPropagation) > 0 && inPropagation[0]

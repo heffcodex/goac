@@ -10,9 +10,8 @@ type IObject interface {
 var _ IObject = (*Object)(nil)
 
 type Object struct {
-	name      string
-	actions   map[string]*Action
-	finalized bool
+	name    string
+	actions map[string]*Action
 }
 
 func NewObject(name string) *Object {
@@ -31,10 +30,6 @@ func (o *Object) Action(name string) IAction {
 
 	action, ok := o.actions[name]
 	if !ok {
-		if o.finalized {
-			panic("cannot append to finalized object")
-		}
-
 		action = &Action{
 			Parameter: Parameter{name: name},
 		}
@@ -65,8 +60,6 @@ func (o *Object) Fresh() IObject {
 }
 
 func (o *Object) Finalize() IObject {
-	o.finalized = true
-
 	for _, action := range o.actions {
 		action.Finalize()
 	}
