@@ -2,6 +2,10 @@ package goac
 
 import "context"
 
+type IEnforcerProvider[T IEmbed] interface {
+	EnforcerFromContext(ctx context.Context) Enforcer[T]
+}
+
 type Enforced[T IEmbed] *T
 type Enforcer[T IEmbed] func(ctx context.Context, object T) (Enforced[T], error)
 
