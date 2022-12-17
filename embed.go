@@ -5,33 +5,24 @@ import (
 )
 
 type IEmbed interface {
-	GetPermissions() []goacoap.Permission
-	SetPermissions(perms []goacoap.Permission)
+	Permissions(perms ...[]goacoap.Permission) []goacoap.Permission
 }
 
 var _ IEmbed = (*Embed)(nil)
 
 type Embed struct {
-	Permissions []goacoap.Permission `json:"__permissions,omitempty"`
+	P []goacoap.Permission `json:"__permissions,omitempty"`
 }
 
-func NewEmbed(perms []goacoap.Permission) *Embed {
-	e := &Embed{}
-
-	if len(perms) > 0 {
-		e.SetPermissions(perms)
+func (e *Embed) Permissions(perms ...[]goacoap.Permission) []goacoap.Permission {
+	if len(perms) > 1 {
+		panic("too many arguments")
+	} else if len(perms) == 1 {
+		e.P = make([]goacoap.Permission, len(perms[0]))
+		copy(e.P, perms[0])
 	}
 
-	return e
-}
-
-func (e *Embed) GetPermissions() []goacoap.Permission {
-	perms := make([]goacoap.Permission, len(e.Permissions))
-	copy(perms, e.Permissions)
-	return perms
-}
-
-func (e *Embed) SetPermissions(perms []goacoap.Permission) {
-	e.Permissions = make([]goacoap.Permission, len(perms))
-	copy(e.Permissions, perms)
+	read := make([]goacoap.Permission, len(e.P))
+	copy(read, e.P)
+	return read
 }
