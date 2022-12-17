@@ -8,27 +8,14 @@ import (
 )
 
 type TestEmbed struct {
-	*Embed
+	Embed
 	TestValue any
-}
-
-func TestNewEmbed(t *testing.T) {
-	s := &TestEmbed{Embed: NewEmbed(nil)}
-	require.Empty(t, s.Permissions())
-
-	obj := goacoap.NewObject("test")
-	obj.Action("a").End().Allow()
-	obj.Action("b").End().Allow()
-	obj.Action("c").End().Allow()
-
-	s = &TestEmbed{Embed: NewEmbed(obj.Permissions())}
-	require.Equal(t, []goacoap.Permission{"test.a", "test.b", "test.c"}, s.Permissions())
 }
 
 func TestEmbed_MarshalJSON(t *testing.T) {
 	s := &TestEmbed{
-		Embed: &Embed{
-			P: []goacoap.Permission{"a", "b", "c"},
+		Embed: Embed{
+			P: &[]goacoap.Permission{"a", "b", "c"},
 		},
 		TestValue: "test",
 	}
@@ -40,11 +27,13 @@ func TestEmbed_MarshalJSON(t *testing.T) {
 
 func TestEmbed_Permissions(t *testing.T) {
 	s := &TestEmbed{
-		Embed: &Embed{
-			P: []goacoap.Permission{"a", "b", "c"},
+		Embed: Embed{
+			P: &[]goacoap.Permission{"a", "b", "c"},
 		},
 	}
 
 	require.Equal(t, []goacoap.Permission{"a", "b", "c"}, s.Permissions())
+
 	require.Equal(t, []goacoap.Permission{"d", "e", "f"}, s.Permissions([]goacoap.Permission{"d", "e", "f"}))
+	require.Equal(t, []goacoap.Permission{"d", "e", "f"}, s.Permissions())
 }
