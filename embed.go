@@ -14,15 +14,33 @@ type Embed struct {
 	P []goacoap.Permission `json:"__permissions,omitempty"`
 }
 
+func NewEmbed(perms []goacoap.Permission) *Embed {
+	e := &Embed{}
+
+	if len(perms) > 0 {
+		e.setPermissions(perms)
+	}
+
+	return e
+}
+
 func (e *Embed) Permissions(perms ...[]goacoap.Permission) []goacoap.Permission {
 	if len(perms) > 1 {
 		panic("too many arguments")
 	} else if len(perms) == 1 {
-		e.P = make([]goacoap.Permission, len(perms[0]))
-		copy(e.P, perms[0])
+		e.setPermissions(perms[0])
 	}
 
-	read := make([]goacoap.Permission, len(e.P))
-	copy(read, e.P)
-	return read
+	return e.getPermissions()
+}
+
+func (e *Embed) getPermissions() []goacoap.Permission {
+	perms := make([]goacoap.Permission, len(e.P))
+	copy(perms, e.P)
+	return perms
+}
+
+func (e *Embed) setPermissions(perms []goacoap.Permission) {
+	e.P = make([]goacoap.Permission, len(perms))
+	copy(e.P, perms)
 }

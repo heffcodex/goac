@@ -12,6 +12,19 @@ type TestEmbed struct {
 	TestValue any
 }
 
+func TestNewEmbed(t *testing.T) {
+	s := &TestEmbed{Embed: NewEmbed(nil)}
+	require.Empty(t, s.Permissions())
+
+	obj := goacoap.NewObject("test")
+	obj.Action("a").End().Allow()
+	obj.Action("b").End().Allow()
+	obj.Action("c").End().Allow()
+
+	s = &TestEmbed{Embed: NewEmbed(obj.Permissions())}
+	require.Equal(t, []goacoap.Permission{"test.a", "test.b", "test.c"}, s.Permissions())
+}
+
 func TestEmbed_MarshalJSON(t *testing.T) {
 	s := &TestEmbed{
 		Embed: &Embed{
