@@ -33,7 +33,4 @@ func TestEmbed_Permissions(t *testing.T) {
 	}
 
 	require.Equal(t, []goacoap.Permission{"a", "b", "c"}, s.Permissions())
-
-	require.Equal(t, []goacoap.Permission{"d", "e", "f"}, s.Permissions([]goacoap.Permission{"d", "e", "f"}))
-	require.Equal(t, []goacoap.Permission{"d", "e", "f"}, s.Permissions())
 }
