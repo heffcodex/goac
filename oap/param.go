@@ -33,7 +33,7 @@ func (p *Parameter) Param(name string) IParameter {
 
 	param, ok := p.params[name]
 	if !ok {
-		param = &Parameter{parent: p, name: name}
+		param = &Parameter{parent: p, name: name, params: make(map[string]*Parameter)}
 		p.params[name] = param
 	}
 

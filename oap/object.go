@@ -31,7 +31,7 @@ func (o *Object) Action(name string) IAction {
 	action, ok := o.actions[name]
 	if !ok {
 		action = &Action{
-			Parameter: Parameter{name: name},
+			Parameter: Parameter{name: name, params: make(map[string]*Parameter)},
 		}
 		o.actions[name] = action
 	}
