@@ -7,7 +7,7 @@ import (
 	goacoap "github.com/heffcodex/goac/oap"
 )
 
-type Enforcer[T any] func(ctx context.Context, object T) (Enforced[T], error)
+type Enforcer[T any] func(ctx context.Context, object T) (*Enforced[T], error)
 
 func EnforcerFromContext[T any](ctx context.Context, key string) Enforcer[T] {
 	return ctx.Value(key).(Enforcer[T])
