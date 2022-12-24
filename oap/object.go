@@ -1,68 +1,36 @@
-package goacoap
+package oap
 
-type IObject interface {
-	INode
-	Action(name string) IAction
-	Fresh() IObject
-	Finalize() IObject
-}
+var (
+	_ IObject    = (*Object)(nil)
+	_ IAction    = (*Action)(nil)
+	_ IParameter = (*Parameter)(nil)
+)
 
-var _ IObject = (*Object)(nil)
+type IObject interface{ IParticle }
+type Object struct{ particle }
 
-type Object struct {
-	name    string
-	actions map[string]*Action
-}
+func (o *Object) setParent(IParticle) {}
 
-func NewObject(name string) *Object {
-	return &Object{
-		name:    name,
-		actions: make(map[string]*Action),
-	}
-}
+type IAction interface{ IParameter }
+type Action struct{ Parameter }
 
-func (o *Object) Name() string { return o.name }
+type IParameter interface{ IParticle }
+type Parameter struct{ particle }
 
-func (o *Object) Action(name string) IAction {
-	if o.actions == nil {
-		o.actions = make(map[string]*Action)
+func Build(o IObject, name ...string) {
+	if len(name) > 1 {
+		panic("too many arguments")
+	} else if len(name) == 1 {
+		o.setName(name[0])
 	}
 
-	action, ok := o.actions[name]
-	if !ok {
-		action = &Action{
-			Parameter: Parameter{name: name, params: make(map[string]*Parameter)},
-		}
-		o.actions[name] = action
-	}
-
-	return action
+	build(o, nil)
 }
 
-func (o *Object) Permissions() []Permission {
-	perms := make([]Permission, 0, len(o.actions))
-
-	for _, action := range o.actions {
-		if !action.allowed {
-			continue
-		}
-
-		for _, perm := range action.Permissions() {
-			perms = append(perms, NewPermission(o.name).AppendPath(perm.String()))
-		}
-	}
-
-	return perms
+func CollectAll(o IObject) []Permission {
+	return collectPermissions(o, func(p IParticle) bool { return true }, []Permission{})
 }
 
-func (o *Object) Fresh() IObject {
-	return NewObject(o.name)
-}
-
-func (o *Object) Finalize() IObject {
-	for _, action := range o.actions {
-		action.Finalize()
-	}
-
-	return o
+func CollectAllowed(o IObject) []Permission {
+	return collectPermissions(o, func(p IParticle) bool { return p.Allowed() }, []Permission{})
 }
